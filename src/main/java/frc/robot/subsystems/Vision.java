@@ -4,7 +4,9 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-public class Vision {
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+public class Vision extends SubsystemBase{
     public static Vision INSTANCE;
 
     public static Vision getInstance() {
@@ -15,19 +17,22 @@ public class Vision {
         return INSTANCE;
     }
 
-    private final PhotonCamera tagCam = new PhotonCamera("Microsoft_LifeCam_HD-3000");
+    private final PhotonCamera tagCam = new PhotonCamera("Octocam_2");
 
     private PhotonPipelineResult currentResults;
 
+    @Override
     public void periodic() {
         if (tagCam.getLatestResult().hasTargets()) {
             currentResults = tagCam.getLatestResult();
         }
-        System.out.println("Best Target:" + this.getBestTarget());
+        else {
+            currentResults = null;
+        }
     }
 
     public PhotonTrackedTarget getBestTarget() {
-        if (currentResults.hasTargets()) {
+        if (tagCam.getLatestResult().hasTargets()) {
             return currentResults.getBestTarget();
         } else {
             return null;
