@@ -41,31 +41,40 @@ public class Vision extends SubsystemBase implements Runnable {
     public Pose3d currentPose = new Pose3d();
 
     public Vision() {
-        Transform3d robotToCam = new Transform3d(new Translation3d(13, 9, 8), new Rotation3d(0, 0, 0));
-        aprilTagFieldLayout = loadFieldLayout();
-
-        photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout,
-                PoseStrategy.LOWEST_AMBIGUITY, tagCam, robotToCam);
-
+        try {
+            Transform3d robotToCam = new Transform3d(new Translation3d(13, 9, 8), new Rotation3d(0, 0, 0));
+            aprilTagFieldLayout = loadFieldLayout();
+    
+            photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout,
+                    PoseStrategy.LOWEST_AMBIGUITY, tagCam, robotToCam);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
     }
 
     @Override
     public void periodic() {
-        if (tagCam.getLatestResult().hasTargets()) {
-            currentResults = tagCam.getLatestResult();
-        } else {
-            currentResults = null;
+        try {
+            if (tagCam.getLatestResult().hasTargets()) {
+                currentResults = tagCam.getLatestResult();
+            } else {
+                currentResults = null;
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
         }
     }
 
     @Override
     public void run() {
-        try {
-            if (this.getEstimatedGlobalPose(currentPose.toPose2d()).isPresent()) {
-                currentPose = this.getEstimatedGlobalPose(currentPose.toPose2d()).get().estimatedPose;
-            }
-        } catch (Exception e) {
+        while(true) {
+            try {
+                if (this.getEstimatedGlobalPose(currentPose.toPose2d()).isPresent()) {
+                    currentPose = getEstimatedGlobalPose(currentPose.toPose2d()).get().estimatedPose;
+                }
+            } catch (Exception e) {
             // TODO: handle exception
+            }            
         }
     }
 
@@ -74,11 +83,15 @@ public class Vision extends SubsystemBase implements Runnable {
     }
 
     public PhotonTrackedTarget getBestTarget() {
-        if (tagCam.getLatestResult().hasTargets()) {
-            return currentResults.getBestTarget();
-        } else {
-            return null;
+        try {
+            if (tagCam.getLatestResult().hasTargets()) {
+                return currentResults.getBestTarget();
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
         }
+
+        return null;
     }
 
     public boolean camHasTarget() {
@@ -99,7 +112,11 @@ public class Vision extends SubsystemBase implements Runnable {
     }
 
     public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
-        photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+        try {
+            photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
         return photonPoseEstimator.update();
     }
 
