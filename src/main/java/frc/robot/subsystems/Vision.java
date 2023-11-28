@@ -13,12 +13,15 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Vision extends SubsystemBase {
+public class Vision extends SubsystemBase implements Runnable {
     public static Vision INSTANCE;
 
     public static Vision getInstance() {
@@ -35,12 +38,15 @@ public class Vision extends SubsystemBase {
 
     private PhotonPipelineResult currentResults;
 
+    public Pose3d currentPose = new Pose3d();
+
     public Vision() {
         Transform3d robotToCam = new Transform3d(new Translation3d(13, 9, 8), new Rotation3d(0, 0, 0));
         aprilTagFieldLayout = loadFieldLayout();
 
         photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout,
                 PoseStrategy.LOWEST_AMBIGUITY, tagCam, robotToCam);
+
     }
 
     @Override
@@ -50,6 +56,21 @@ public class Vision extends SubsystemBase {
         } else {
             currentResults = null;
         }
+    }
+
+    @Override
+    public void run() {
+        try {
+            if (this.getEstimatedGlobalPose(currentPose.toPose2d()).isPresent()) {
+                currentPose = this.getEstimatedGlobalPose(currentPose.toPose2d()).get().estimatedPose;
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+    }
+
+    public Pose3d getCurrentPose() {
+        return currentPose;
     }
 
     public PhotonTrackedTarget getBestTarget() {

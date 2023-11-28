@@ -29,8 +29,7 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
   public Vision vision;
-
-  public Pose3d currentPose = new Pose3d();
+  private Thread visionThread;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -42,6 +41,10 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     vision = Vision.getInstance();
+
+    visionThread = new Thread(vision);
+
+    visionThread.start();
   }
 
   /**
@@ -54,19 +57,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    // var threader = Executors.newSingleThreadScheduledExecutor();
-    try {
-      // threader.scheduleWithFixedDelay(new Thread(() -> vision.getEstimatedGlobalPose(currentPose.toPose2d())), 0, 5,
-      //     TimeUnit.MILLISECONDS);
-      if (vision.getEstimatedGlobalPose(currentPose.toPose2d()).isPresent()) {
-        currentPose = vision.getEstimatedGlobalPose(currentPose.toPose2d()).get().estimatedPose;
-        SmartDashboard.putNumber("X", currentPose.getX());
-        SmartDashboard.putNumber("Y", currentPose.getY());
-        SmartDashboard.putNumber("Z", currentPose.getZ());
-      }
-    } catch (Exception e) {
-      // TODO: handle exception
-    }
+    SmartDashboard.putNumber("X", vision.getCurrentPose().getX());
+    SmartDashboard.putNumber("Y", vision.getCurrentPose().getY());
+    SmartDashboard.putNumber("Z", vision.getCurrentPose().getZ());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
