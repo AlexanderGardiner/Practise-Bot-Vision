@@ -58,9 +58,9 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     // System.out.print(visionThread.isAlive());
-    SmartDashboard.putNumber("X", vision.getCurrentPose().getX());
-    SmartDashboard.putNumber("Y", vision.getCurrentPose().getY());
-    SmartDashboard.putNumber("Z", vision.getCurrentPose().getZ());
+    SmartDashboard.putNumber("X", vision.getCurrentPoseOne().getX() - vision.getCurrentPoseTwo().getX());
+    SmartDashboard.putNumber("Y", vision.getCurrentPoseOne().getY() - vision.getCurrentPoseTwo().getY());
+    SmartDashboard.putNumber("Z", vision.getCurrentPoseOne().getZ() - vision.getCurrentPoseTwo().getZ());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

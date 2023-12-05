@@ -34,22 +34,30 @@ public class Vision extends SubsystemBase implements Runnable {
     }
 
     private final PhotonCamera tagCam = new PhotonCamera("Octocam_2");
+    private final PhotonCamera tagCam2 = new PhotonCamera("Octocam_3");
     AprilTagFieldLayout aprilTagFieldLayout = null;
-    PhotonPoseEstimator photonPoseEstimator = null;
+    PhotonPoseEstimator photonPoseEstimatorOne = null;
+    PhotonPoseEstimator photonPoseEstimatorTwo = null;
 
     private PhotonPipelineResult currentResults;
 
-    public Pose3d currentPose = new Pose3d();
+    public Pose3d currentPoseCamOne = new Pose3d();
+    public Pose3d currentPoseCamTwo = new Pose3d();
 
     public Vision() {
         try {
-            Transform3d robotToCam = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(13), Units.inchesToMeters(9), Units.inchesToMeters(8)),
+            Transform3d robotToCamOne = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(11), Units.inchesToMeters(17)),
+                    new Rotation3d(0, 0, 0));
+            Transform3d robotToCamTwo = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(-12), Units.inchesToMeters(10), Units.inchesToMeters(17)),
                     new Rotation3d(0, 0, 0));
             aprilTagFieldLayout = loadFieldLayout();
 
-            photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout,
-                    PoseStrategy.LOWEST_AMBIGUITY, tagCam, robotToCam);
+            photonPoseEstimatorOne = new PhotonPoseEstimator(aprilTagFieldLayout,
+                    PoseStrategy.LOWEST_AMBIGUITY, tagCam, robotToCamOne);
+            photonPoseEstimatorTwo = new PhotonPoseEstimator(aprilTagFieldLayout,
+                    PoseStrategy.LOWEST_AMBIGUITY, tagCam2, robotToCamTwo);
         } catch (Exception e) {
             // TODO: handle exception
         }
@@ -72,8 +80,11 @@ public class Vision extends SubsystemBase implements Runnable {
     public void run() {
         while (true) {
             try {
-                if (this.getEstimatedGlobalPose(currentPose.toPose2d()).isPresent()) {
-                    currentPose = getEstimatedGlobalPose(currentPose.toPose2d()).get().estimatedPose;
+                if (this.getEstimatedGlobalPoseOne(currentPoseCamOne.toPose2d()).isPresent()) {
+                    currentPoseCamOne = getEstimatedGlobalPoseOne(currentPoseCamOne.toPose2d()).get().estimatedPose;
+                }
+                if (this.getEstimatedGlobalPoseTwo(currentPoseCamTwo.toPose2d()).isPresent()) {
+                    currentPoseCamOne = getEstimatedGlobalPoseTwo(currentPoseCamTwo.toPose2d()).get().estimatedPose;
                 }
             } catch (Exception e) {
                 // TODO: handle exception
@@ -81,8 +92,12 @@ public class Vision extends SubsystemBase implements Runnable {
         }
     }
 
-    public Pose3d getCurrentPose() {
-        return currentPose;
+    public Pose3d getCurrentPoseOne() {
+        return currentPoseCamOne;
+    }
+
+    public Pose3d getCurrentPoseTwo() {
+        return currentPoseCamTwo;
     }
 
     public PhotonTrackedTarget getBestTarget() {
@@ -114,13 +129,22 @@ public class Vision extends SubsystemBase implements Runnable {
         return new AprilTagFieldLayout(null, 0, 0);
     }
 
-    public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+    public Optional<EstimatedRobotPose> getEstimatedGlobalPoseOne(Pose2d prevEstimatedRobotPose) {
         try {
-            photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+            photonPoseEstimatorOne.setReferencePose(prevEstimatedRobotPose);
         } catch (Exception e) {
             // TODO: handle exception
         }
-        return photonPoseEstimator.update();
+        return photonPoseEstimatorOne.update();
+    }
+
+    public Optional<EstimatedRobotPose> getEstimatedGlobalPoseTwo(Pose2d prevEstimatedRobotPose) {
+        try {
+            photonPoseEstimatorTwo.setReferencePose(prevEstimatedRobotPose);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return photonPoseEstimatorTwo.update();
     }
 
 }
