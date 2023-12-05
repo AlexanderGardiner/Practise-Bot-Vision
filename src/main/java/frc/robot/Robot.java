@@ -57,6 +57,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    // System.out.print(visionThread.isAlive());
     SmartDashboard.putNumber("X", vision.getCurrentPose().getX());
     SmartDashboard.putNumber("Y", vision.getCurrentPose().getY());
     SmartDashboard.putNumber("Z", vision.getCurrentPose().getZ());
