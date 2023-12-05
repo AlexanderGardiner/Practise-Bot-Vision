@@ -84,7 +84,7 @@ public class Vision extends SubsystemBase implements Runnable {
                     currentPoseCamOne = getEstimatedGlobalPoseOne(currentPoseCamOne.toPose2d()).get().estimatedPose;
                 }
                 if (this.getEstimatedGlobalPoseTwo(currentPoseCamTwo.toPose2d()).isPresent()) {
-                    currentPoseCamOne = getEstimatedGlobalPoseTwo(currentPoseCamTwo.toPose2d()).get().estimatedPose;
+                    currentPoseCamTwo = getEstimatedGlobalPoseTwo(currentPoseCamTwo.toPose2d()).get().estimatedPose;
                 }
             } catch (Exception e) {
                 // TODO: handle exception
