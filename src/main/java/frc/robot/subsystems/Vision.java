@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -41,7 +42,9 @@ public class Vision extends SubsystemBase implements Runnable {
     public Pose3d currentPose = new Pose3d();
 
     public Vision() {
-        Transform3d robotToCam = new Transform3d(new Translation3d(13, 9, 8), new Rotation3d(0, 0, 0));
+        Transform3d robotToCam = new Transform3d(
+                new Translation3d(Units.inchesToMeters(13), Units.inchesToMeters(9), Units.inchesToMeters(8)),
+                new Rotation3d(0, 0, 0));
         aprilTagFieldLayout = loadFieldLayout();
 
         photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout,
