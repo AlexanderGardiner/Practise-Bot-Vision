@@ -60,6 +60,8 @@ public class Robot extends TimedRobot {
     // System.out.print(visionThread.isAlive());
     SmartDashboard.putNumber("Difference X", vision.getCurrentPoseOne().getX() - vision.getCurrentPoseTwo().getX());
     SmartDashboard.putNumber("X1", vision.getCurrentPoseOne().getX());
+    SmartDashboard.putNumber("y1", vision.getCurrentPoseOne().getY());
+    SmartDashboard.putNumber("z1", vision.getCurrentPoseOne().getZ());
     SmartDashboard.putNumber("X2", vision.getCurrentPoseTwo().getX());
     SmartDashboard.putNumber("Difference Y", vision.getCurrentPoseOne().getY() - vision.getCurrentPoseTwo().getY());
     SmartDashboard.putNumber("Difference Z", vision.getCurrentPoseOne().getZ() - vision.getCurrentPoseTwo().getZ());
