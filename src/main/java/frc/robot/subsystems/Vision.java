@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
@@ -39,7 +40,7 @@ public class Vision extends SubsystemBase implements Runnable {
     PhotonPoseEstimator photonPoseEstimatorOne = null;
     PhotonPoseEstimator photonPoseEstimatorTwo = null;
 
-    private PhotonPipelineResult currentResults;
+    private List<PhotonTrackedTarget> currentResults;
 
     public Pose3d currentPoseCamOne = new Pose3d();
     public Pose3d currentPoseCamTwo = new Pose3d();
@@ -67,9 +68,12 @@ public class Vision extends SubsystemBase implements Runnable {
     public void periodic() {
         try {
             if (tagCam.getLatestResult().hasTargets()) {
-                currentResults = tagCam.getLatestResult();
-            } else {
-                currentResults = null;
+                currentResults = tagCam.getLatestResult().getTargets();
+            }
+            if (tagCam2.getLatestResult().hasTargets()) {
+                for (int i = 0; i < tagCam2.getLatestResult().getTargets().size() - 1; i++) {
+                    currentResults.add(tagCam2.getLatestResult().getTargets().get(i));
+                }
             }
         } catch (Exception e) {
             // TODO: handle exception
@@ -80,9 +84,17 @@ public class Vision extends SubsystemBase implements Runnable {
     public void run() {
         while (true) {
             try {
+                if (!currentResults.isEmpty()) {
+                    for (int i = 0; i < currentResults.size() - 1; i++) {
+                        currentResults.remove(
+                                currentResults.get(i).getPoseAmbiguity() > 0.5 ? currentResults.remove(i) : null);
+                        i--;
+                    }
+                }
                 if (this.getEstimatedGlobalPoseOne(currentPoseCamOne.toPose2d()).isPresent()) {
                     currentPoseCamOne = getEstimatedGlobalPoseOne(currentPoseCamOne.toPose2d()).get().estimatedPose;
                 }
+
                 if (this.getEstimatedGlobalPoseTwo(currentPoseCamTwo.toPose2d()).isPresent()) {
                     currentPoseCamTwo = getEstimatedGlobalPoseTwo(currentPoseCamTwo.toPose2d()).get().estimatedPose;
                 }
@@ -100,17 +112,17 @@ public class Vision extends SubsystemBase implements Runnable {
         return currentPoseCamTwo;
     }
 
-    public PhotonTrackedTarget getBestTarget() {
-        try {
-            if (tagCam.getLatestResult().hasTargets()) {
-                return currentResults.getBestTarget();
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
+    // public PhotonTrackedTarget getBestTarget() {
+    //     try {
+    //         if (tagCam.getLatestResult().hasTargets()) {
+    //             return currentResults.getBestTarget();
+    //         }
+    //     } catch (Exception e) {
+    //         // TODO: handle exception
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 
     public boolean camHasTarget() {
         if (currentResults == null) {
