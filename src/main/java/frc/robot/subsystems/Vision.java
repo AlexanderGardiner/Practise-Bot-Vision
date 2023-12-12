@@ -50,7 +50,7 @@ public class Vision extends SubsystemBase implements Runnable {
                     new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(11), Units.inchesToMeters(17)),
                     new Rotation3d(0, 0, 0));
             Transform3d robotToCamTwo = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(-12), Units.inchesToMeters(10), Units.inchesToMeters(17)),
+                    new Translation3d(Units.inchesToMeters(-11), Units.inchesToMeters(10), Units.inchesToMeters(17)),
                     new Rotation3d(0, 0, 0));
             aprilTagFieldLayout = loadFieldLayout();
 
